@@ -21,7 +21,7 @@ export default function Passenger({ token }) {
   const request = () => act(() => api('/rides', { method: 'POST', token, body: { pickup_zone_id: +f.pickup, dest_zone_id: +f.dest, seats: +f.seats } }));
   const cancel = (id) => act(() => api(`/rides/${id}/cancel`, { method: 'POST', token }));
 
-  if (!rides) return <p className="muted">Loading…</p>;
+  if (!rides) return <div className="card"><div className="skeleton" style={{width:'60%'}}/><div className="skeleton" style={{width:'85%'}}/><div className="skeleton" style={{width:'40%'}}/></div>;
   const active = rides.find((r) => LIVE.includes(r.status));
   return (<>
     {err && <p className="err">{err}</p>}
