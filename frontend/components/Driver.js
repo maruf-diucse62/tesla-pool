@@ -14,7 +14,7 @@ export default function Driver({ token }) {
   useEffect(() => { load(); const t = setInterval(load, 3000); return () => clearInterval(t); }, [load]);
   const act = async (fn) => { setBusy(true); setErr(''); try { await fn(); } catch (e) { setErr(e.message); } finally { await load(); setBusy(false); } };
 
-  if (!data) return <p className="muted">Loading…</p>;
+  if (!data) return <div className="card"><div className="skeleton" style={{width:'50%'}}/><div className="skeleton" style={{width:'80%'}}/><div className="skeleton" style={{width:'65%'}}/></div>;
   const { pool, reqs, history } = data; const step = pool.pool && NEXT[pool.pool.status];
   return (<>
     {err && <p className="err">{err}</p>}
