@@ -1,0 +1,104 @@
+@api = http://localhost:4000
+
+### 1. Login: Jashim (driver), Nusrat, Rafiq (passengers)
+# @name jashim
+POST {{api}}/auth/login
+Content-Type: application/json
+
+{"email":"jashim@teslapool.bd","password":"password123"}
+
+###
+# @name nusrat
+POST {{api}}/auth/login
+Content-Type: application/json
+
+{"email":"nusrat@teslapool.bd","password":"password123"}
+
+###
+# @name rafiq
+POST {{api}}/auth/login
+Content-Type: application/json
+
+{"email":"rafiq@teslapool.bd","password":"password123"}
+
+### 2. Zones (Banani=1, Mohakhali=2, Gulshan 1=3)
+GET {{api}}/zones
+
+### 3. Estimate for Nusrat: alone 7000 paisa, shared 5600
+GET {{api}}/rides/estimate?pickup=1&dest=2&seats=1
+Authorization: Bearer {{nusrat.response.body.token}}
+
+### 4. Jashim goes online
+POST {{api}}/driver/online
+Authorization: Bearer {{jashim.response.body.token}}
+Content-Type: application/json
+
+{"online":true}
+
+### 5. Nusrat requests Banani -> Mohakhali (status REQUESTED)
+# @name nusratRide
+POST {{api}}/rides
+Authorization: Bearer {{nusrat.response.body.token}}
+Content-Type: application/json
+
+{"pickup_zone_id":1,"dest_zone_id":2,"seats":1}
+
+### 6. Jashim sees waiting requests
+GET {{api}}/driver/requests
+Authorization: Bearer {{jashim.response.body.token}}
+
+### 7. Jashim accepts Nusrat -> a pool opens on Bullet
+POST {{api}}/driver/requests/{{nusratRide.response.body.id}}/accept
+Authorization: Bearer {{jashim.response.body.token}}
+
+### 8. Rafiq requests Banani -> Gulshan 1: auto-joins Bullet (status MATCHED)
+# @name rafiqRide
+POST {{api}}/rides
+Authorization: Bearer {{rafiq.response.body.token}}
+Content-Type: application/json
+
+{"pickup_zone_id":1,"dest_zone_id":3,"seats":1}
+
+### 9. Jashim sees the pool: 2 passengers, seats_used 2 of 3
+GET {{api}}/driver/pool
+Authorization: Bearer {{jashim.response.body.token}}
+
+### 10. Edge case: Nusrat cannot see Rafiq's ride (expect 404)
+GET {{api}}/rides/{{rafiqRide.response.body.id}}
+Authorization: Bearer {{nusrat.response.body.token}}
+
+### 11. Edge case: skipping a step (expect 409)
+POST {{api}}/driver/pool/start
+Authorization: Bearer {{jashim.response.body.token}}
+
+### 12. Trip: arrive, start, complete
+POST {{api}}/driver/pool/arrive
+Authorization: Bearer {{jashim.response.body.token}}
+
+###
+POST {{api}}/driver/pool/start
+Authorization: Bearer {{jashim.response.body.token}}
+
+### 13. Fares locked: Nusrat 5600, Rafiq 6800
+GET {{api}}/rides/{{nusratRide.response.body.id}}
+Authorization: Bearer {{nusrat.response.body.token}}
+
+###
+GET {{api}}/rides/{{rafiqRide.response.body.id}}
+Authorization: Bearer {{rafiq.response.body.token}}
+
+### 14. Edge case: cancel after start (expect 409)
+POST {{api}}/rides/{{nusratRide.response.body.id}}/cancel
+Authorization: Bearer {{nusrat.response.body.token}}
+
+###
+POST {{api}}/driver/pool/complete
+Authorization: Bearer {{jashim.response.body.token}}
+
+### 15. History
+GET {{api}}/rides
+Authorization: Bearer {{nusrat.response.body.token}}
+
+###
+GET {{api}}/driver/history
+Authorization: Bearer {{jashim.response.body.token}}
