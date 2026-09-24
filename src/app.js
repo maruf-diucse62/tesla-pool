@@ -84,5 +84,43 @@ app.post('/rides/:id/cancel', auth('passenger'), wrap(async (req, res) => {
   res.json(await ride(req.params.id));
 }));
 
+// ---------- Driver ----------
+const myVehicle = async (uid) => (await db.query('SELECT * FROM vehicles WHERE driver_id=$1', [uid])).rows[0];
+app.post('/driver/online', auth('driver'), wrap(async (req, res) => {
+  const v = (await db.query('UPDATE vehicles SET is_online=$2 WHERE driver_id=$1 RETURNING *', [req.user.id, !!req.body.online])).rows[0];
+  res.json(v);
+}));
+app.get('/driver/requests', auth('driver'), wrap(async (req, res) => {
+  const v = await myVehicle(req.user.id);
+  if (!v.is_online) return res.json([]);
+  res.json((await db.query(`SELECT r.id,r.seats,pz.name AS pickup,dz.name AS destination,u.name AS passenger FROM ride_requests r
+    JOIN zones pz ON pz.id=r.pickup_zone_id JOIN zones dz ON dz.id=r.dest_zone_id JOIN users u ON u.id=r.passenger_id
+    WHERE r.status='REQUESTED' ORDER BY r.id`)).rows);
+}));
+app.post('/driver/requests/:id/accept', auth('driver'), wrap(async (req, res) => {
+  const v = await myVehicle(req.user.id);
+  const p = await tx((c) => P.assign(c, +req.params.id, v.id, req.user.id));
+  res.json(p);
+}));
+app.get('/driver/pool', auth('driver'), wrap(async (req, res) => {
+  const v = await myVehicle(req.user.id);
+  const p = (await db.query("SELECT * FROM pools WHERE vehicle_id=$1 AND status IN ('ACCEPTED','DRIVER_ARRIVED','STARTED')", [v.id])).rows[0];
+  if (!p) return res.json({ pool: null, capacity: v.capacity });
+  const members = (await db.query(`SELECT r.id,u.name AS passenger,r.seats,r.status,r.fare_paisa,dz.name AS destination FROM ride_requests r
+    JOIN users u ON u.id=r.passenger_id JOIN zones dz ON dz.id=r.dest_zone_id WHERE r.pool_id=$1 AND r.status<>'CANCELLED'`, [p.id])).rows;
+  res.json({ pool: p, capacity: v.capacity, seats_used: members.reduce((s, m) => s + m.seats, 0), members });
+}));
+for (const action of ['arrive', 'start', 'complete'])
+  app.post(`/driver/pool/${action}`, auth('driver'), wrap(async (req, res) => {
+    const v = await myVehicle(req.user.id);
+    res.json(await tx((c) => P.advance(c, v.id, action, req.user.id)));
+  }));
+app.get('/driver/history', auth('driver'), wrap(async (req, res) => {
+  const v = await myVehicle(req.user.id);
+  res.json((await db.query(`SELECT p.id AS pool_id,p.status,p.created_at,COUNT(r.id) FILTER (WHERE r.status<>'CANCELLED') AS passengers,
+    COALESCE(SUM(r.fare_paisa) FILTER (WHERE r.status='COMPLETED'),0) AS total_fare_paisa FROM pools p LEFT JOIN ride_requests r ON r.pool_id=p.id
+    WHERE p.vehicle_id=$1 GROUP BY p.id ORDER BY p.id DESC`, [v.id])).rows);
+}));
+
 app.use((e, _q, res, _n) => { if (!e.status) console.error(e); res.status(e.status || 500).json({ error: e.status ? e.message : 'Something went wrong' }); });
 module.exports = app;
