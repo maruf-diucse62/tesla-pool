@@ -51,8 +51,46 @@ Every seat claim runs in one DB transaction that first does `SELECT … FROM veh
 `POST /auth/signup|login` · `GET /zones` · `GET /rides/estimate` · `POST /rides` · `GET /rides` · `GET /rides/:id` · `POST /rides/:id/cancel` · `POST /driver/online` · `GET /driver/requests` · `POST /driver/requests/:id/accept` · `GET /driver/pool` · `POST /driver/pool/arrive|start|complete` · `GET /driver/history`
 
 ## Known limitations / next
-No payment logic; no rate limiting; one active ride per passenger; simple corridor geography.
+No payment logic; no rate limiting; one active ride per passenger; simple
+corridor geography instead of real routing; no automated frontend tests;
+API instances aren't yet stateless-scaled (fine for one MVP instance).
 
-## AI Usage (fill in honestly)
-Tools: Claude — scaffolding + explanations. Accepted: row-lock approach for seat claims. Rejected/changed: **write your own example here**.
-## Video: <link>   ·   Deployment: <link>
+## Testing
+`test/fare.test.js` is a pure unit test (no DB) checking the hand-calculated
+fares above. `test/pool.test.js` is a single integration test against a real
+Postgres that walks the whole story in one pass: Nusrat requests, Jashim
+accepts (pool opens), Rafiq auto-joins the same Bullet, two more passengers
+race for the last seat (exactly one gets **MATCHED**, the other stays
+waiting), Shirin can't read or cancel Nusrat's ride (**404**), invalid trip
+transitions are rejected (**409**), fares lock correctly at trip start, and
+cancelling a started ride is rejected.
+
+## Bonus: scaling to 1M passengers / 100k drivers
+Not built for the MVP, but the direction: shard matching by geography (one
+matching worker per zone/area, so no single process compares every open
+request against every other); move the vehicle-row lock to a
+Redis-backed distributed lock or a queue-per-zone so Postgres isn't the
+contention point at scale; read replicas for history/estimate reads,
+primary only for the transactional seat-claim path; cache the (mostly
+static) zones table; push status updates over WebSockets/SSE instead of
+3-second polling; idempotency keys on `/rides` and `/driver/requests/:id/accept`
+so retried requests can't double-book; rate-limit per user; add
+tracing/metrics around the lock-acquisition path specifically, since that's
+where contention will show up first; blue-green deploys behind a load
+balancer, stateless API instances so any of them can serve any request.
+
+## AI Usage
+Tools: Claude — scaffolding, the locking/concurrency approach for seat
+claims, and this README. Accepted: the `SELECT ... FOR UPDATE` row-lock
+pattern for the last-seat race.
+**Rejected/changed — fill this in yourself before submitting**: this needs
+to be a real example from your own process (e.g. a naming choice you
+reverted, a discount percentage you changed, a suggestion you simplified).
+A genuine one-line answer here is part of what the brief is scoring —
+don't skip it or leave it generic.
+
+## Screenshots
+_Add 2–3 screenshots or a short GIF here once you've run it locally:
+the login screen, an active ride card, and the driver's current pool._
+
+## Video: <add your Loom link>   ·   Deployment: <add your deployment URL, or write "not deployed — see Docker instructions above" if you run out of time>
