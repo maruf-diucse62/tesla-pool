@@ -19,14 +19,14 @@ export default function Home() {
       sessionStorage.setItem('session', JSON.stringify(s)); setSession(s);
     } catch (x) { setErr(x.message); } finally { setBusy(false); }
   }
-  const logout = () => { sessionStorage.clear(); setSession(null); setForm({ name: '', email: '', password: '' }); };
+  const logout = () => { sessionStorage.clear(); setSession(null); };
 
   if (!session) return (
     <main><div className="hero"><h1>🛺 Dhaka Tesla Pool</h1><p>Share a seat. Split the fare. Survive Dhaka traffic.</p></div>
       <form className="card" onSubmit={submit}>
         {signup && <input placeholder="Name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />}
         <input placeholder="Email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
-        <input type="password" autoComplete="new-password" placeholder="Password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} />
+        <input type="password" placeholder="Password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} />
         <button disabled={busy}>{busy ? 'Please wait…' : signup ? 'Sign up' : 'Log in'}</button>
         <button type="button" className="alt" onClick={() => setSignup(!signup)}>{signup ? 'I have an account' : 'New passenger'}</button>
         {err && <p className="err">{err}</p>}
