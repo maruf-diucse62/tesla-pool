@@ -26,7 +26,7 @@ export default function Home() {
       <form className="card" onSubmit={submit}>
         {signup && <input placeholder="Name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />}
         <input placeholder="Email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
-        <input type="password" autoComplete="new-password" placeholder="Password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} />
+        <input type="password" autoComplete="off" readOnly onFocus={(e) => e.target.removeAttribute('readOnly')} placeholder="Password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} />
         <button disabled={busy}>{busy ? 'Please wait…' : signup ? 'Sign up' : 'Log in'}</button>
         <button type="button" className="alt" onClick={() => setSignup(!signup)}>{signup ? 'I have an account' : 'New passenger'}</button>
         {err && <p className="err">{err}</p>}
