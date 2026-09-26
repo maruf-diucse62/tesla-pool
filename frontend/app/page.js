@@ -7,7 +7,7 @@ import Driver from '../components/Driver';
 const DEMO = ['jashim', 'nusrat', 'rafiq', 'shirin'];
 export default function Home() {
   const [session, setSession] = useState(null);
-  const [form, setForm] = useState({ name: '', email: '', password: 'password123' });
+  const [form, setForm] = useState({ name: '', email: '', password: '' });
   const [signup, setSignup] = useState(false);
   const [err, setErr] = useState(''); const [busy, setBusy] = useState(false);
   useEffect(() => { const s = sessionStorage.getItem('session'); if (s) setSession(JSON.parse(s)); }, []);
