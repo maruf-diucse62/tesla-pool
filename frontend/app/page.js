@@ -4,7 +4,6 @@ import { api } from '../lib/api';
 import Passenger from '../components/Passenger';
 import Driver from '../components/Driver';
 
-const DEMO = ['jashim', 'nusrat', 'rafiq', 'shirin'];
 export default function Home() {
   const [session, setSession] = useState(null);
   const [form, setForm] = useState({ name: '', email: '', password: '' });
@@ -30,8 +29,7 @@ export default function Home() {
         <button disabled={busy}>{busy ? 'Please wait…' : signup ? 'Sign up' : 'Log in'}</button>
         <button type="button" className="alt" onClick={() => setSignup(!signup)}>{signup ? 'I have an account' : 'New passenger'}</button>
         {err && <p className="err">{err}</p>}
-        <p className="muted">Demo (password123):{' '}
-          {DEMO.map((n) => <button type="button" className="chip" key={n} onClick={() => setForm({ ...form, email: `${n}@teslapool.bd` })}>{n}</button>)}</p>
+        <p className="muted">Demo accounts (password123): jashim@teslapool.bd, nusrat@teslapool.bd, rafiq@teslapool.bd, shirin@teslapool.bd</p>
       </form></main>);
 
   return (
