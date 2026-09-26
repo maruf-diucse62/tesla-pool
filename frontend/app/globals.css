@@ -5,164 +5,74 @@
    The active ride is styled like a torn ticket stub: "share a seat" is a
    transit idea, so the UI should feel like boarding, not like a form. */
 
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 :root{
-  --bg:#F2F1EA;
-  --paper:#FFFFFF;
-  --ink:#1C1F1A;
-  --muted:#6B7268;
-  --line:#DCDCCF;
-  --rick:#B23A2E;      /* rickshaw-body red — primary actions */
-  --rick-d:#8F2C22;
-  --route:#C98A1F;      /* route-map amber — waiting / in-transit */
-  --go:#2F6B45;          /* rickshaw-hood green — matched / completed */
-  --danger:#A6362A;
-  --focus:#C98A1F;
+  --bg-a:#eef2ff; --bg-b:#f5f7ff; --card:#fff; --ink:#111827; --muted:#6b7280; --line:#e5e7eb;
+  --brand:#4f46e5; --brand-d:#4338ca; --brand-2:#06b6d4; --danger:#dc2626;
+  --radius:16px; --shadow:0 1px 2px #1118270a, 0 8px 24px #11182710;
 }
 *{box-sizing:border-box}
-body{
-  font-family:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
-  background:var(--bg);
-  color:var(--ink);
-  margin:0;
-  line-height:1.55;
-  -webkit-font-smoothing:antialiased;
-}
-main{max-width:640px;margin:0 auto;padding:22px 16px 56px}
-h1,h2,h3{
-  font-family:"Space Grotesk",system-ui,sans-serif;
-  margin:0 0 6px;
-  letter-spacing:-0.01em;
-  font-weight:600;
-}
-h3{font-size:16px}
-p{margin:0 0 8px}
+body{font-family:Inter,system-ui,-apple-system,sans-serif;margin:0;color:var(--ink);line-height:1.5;
+  background:linear-gradient(160deg,var(--bg-a),var(--bg-b) 60%);min-height:100vh}
+main{max-width:520px;margin:0 auto;padding:32px 18px 56px}
+h1{font-size:30px;font-weight:800;letter-spacing:-.02em;margin:0 0 4px}
+h2{font-size:19px;font-weight:700;margin:0;letter-spacing:-.01em}
+h3{font-size:16px;font-weight:700;margin:0 0 10px}
 
-/* ---------- header / identity ---------- */
-.top{
-  display:flex;justify-content:space-between;align-items:center;
-  padding:2px 2px 18px;
-}
-.top h2{font-size:19px;margin:0;display:flex;gap:10px;align-items:center;font-weight:600}
-.top .tag{margin-left:2px}
+.hero{background:linear-gradient(135deg,var(--brand),var(--brand-2));color:#fff;border-radius:20px;
+  padding:32px 26px;margin-bottom:20px;box-shadow:0 12px 32px #4f46e540;position:relative;overflow:hidden}
+.hero::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at 85% -10%,#ffffff33,transparent 55%)}
+.hero p{margin:6px 0 0;opacity:.92;font-size:14.5px;position:relative}
+.hero h1{position:relative}
 
-.hero{
-  padding:34px 4px 22px;
-  border-bottom:3px solid var(--ink);
-  margin-bottom:22px;
-  animation:rise .5s ease-out both;
-}
-.hero h1{
-  font-size:clamp(30px,7vw,40px);
-  line-height:1.05;
-  display:flex;align-items:center;gap:12px;
-}
-.hero p{color:var(--muted);font-size:15px;margin-top:6px}
-@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.top{display:flex;justify-content:space-between;align-items:center;background:var(--card);
+  border:1px solid var(--line);border-radius:var(--radius);padding:14px 18px;box-shadow:var(--shadow);margin-bottom:4px}
+.top h2{display:flex;gap:10px;align-items:center}
 
-/* ---------- cards ---------- */
-.card{
-  background:var(--paper);
-  border:1px solid var(--line);
-  border-radius:4px;
-  padding:20px;
-  margin:0 0 14px;
-  position:relative;
-}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:20px;margin:16px 0;box-shadow:var(--shadow)}
 
-/* the active-ride card is the only one with a .steps tracker inside it —
-   give *that specific card* a ticket-stub treatment: a perforated tear
-   line above the fare, punched with the page's own background color. */
-.card:has(.steps){
-  border-left:4px solid var(--route);
-}
-.card:has(.steps) .price{
-  padding-top:14px;position:relative;
-}
-.card:has(.steps) .price::before{
-  content:"";position:absolute;top:0;left:-20px;right:-20px;
-  height:0;border-top:2px dashed var(--line);
-}
-.card:has(.steps) .price::after{
-  content:"";position:absolute;top:-7px;left:-27px;width:14px;height:14px;
-  background:var(--bg);border-radius:50%;border:1px solid var(--line);border-left:0;
-}
+button{background:var(--brand);color:#fff;border:0;border-radius:11px;padding:11px 18px;
+  font-weight:600;font-size:14.5px;cursor:pointer;margin:4px 6px 4px 0;
+  transition:transform .1s, background .15s, box-shadow .15s;box-shadow:0 2px 8px #4f46e530}
+button:hover{background:var(--brand-d);transform:translateY(-1px)}
+button:active{transform:translateY(0)}
+button:disabled{opacity:.5;cursor:wait;transform:none}
+button.alt{background:#f3f4f6;color:var(--ink);box-shadow:none}
+button.alt:hover{background:#e5e7eb}
+button.toggle-on{background:var(--ink);color:#fff}
 
-/* ---------- buttons & inputs ---------- */
-button{
-  font-family:"IBM Plex Sans",sans-serif;
-  background:var(--rick);color:#fff;border:0;border-radius:3px;
-  padding:10px 18px;font-weight:600;font-size:14px;cursor:pointer;
-  margin:4px 8px 4px 0;transition:background .15s, transform .08s;
-}
-button:hover{background:var(--rick-d)}
-button:active{transform:translateY(1px)}
-button:disabled{opacity:.45;cursor:wait}
-button.alt{background:transparent;color:var(--ink);border:1px solid var(--line)}
-button.alt:hover{background:#00000008;border-color:var(--ink)}
-button.chip{
-  background:transparent;color:var(--muted);border:1px solid var(--line);
-  padding:5px 13px;font-size:13px;font-weight:500;border-radius:999px;
-}
-button.chip:hover{border-color:var(--ink);color:var(--ink)}
+.field{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
+.field label{font-size:12.5px;font-weight:600;color:var(--muted);margin-left:2px}
+input,select{padding:12px 14px;border:1.5px solid var(--line);border-radius:11px;font-size:14.5px;
+  background:#fafafe;width:100%;transition:.15s;font-family:inherit}
+input:focus,select:focus{outline:none;border-color:var(--brand);background:#fff;box-shadow:0 0 0 4px #4f46e51a}
+input::placeholder{color:#9ca3af}
 
-input,select{
-  padding:11px 13px;margin:4px 8px 4px 0;border:1px solid var(--line);
-  border-radius:3px;font-size:14px;background:var(--paper);min-width:150px;
-  font-family:inherit;color:var(--ink);
-}
-input:focus,select:focus{outline:2px solid var(--focus);outline-offset:1px;border-color:var(--focus)}
-input::placeholder{color:#97998f}
+.segment{display:flex;background:#f3f4f6;border-radius:11px;padding:4px;margin-bottom:16px;gap:4px}
+.segment button{flex:1;margin:0;background:transparent;color:var(--muted);box-shadow:none;padding:9px}
+.segment button.active{background:#fff;color:var(--ink);box-shadow:0 1px 3px #1118271a}
 
-.err{
-  color:var(--danger);background:#FBEEEC;border:1px solid #E7C9C4;
-  padding:11px 13px;border-radius:3px;font-size:14px;
-}
-.muted{color:var(--muted)}
+.err{color:var(--danger);background:#fef2f2;border:1px solid #fecaca;padding:10px 14px;border-radius:11px;font-size:14px}
+.muted{color:var(--muted);font-size:13.5px}
+.demo-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.demo-list span{background:#eef2ff;color:var(--brand-d);border-radius:8px;padding:3px 9px;font-size:12.5px;font-weight:500}
 
-/* ---------- status tags ---------- */
-.tag{
-  display:inline-block;background:#EEEEE3;color:var(--muted);
-  border-radius:3px;padding:2px 10px;font-size:12px;font-weight:600;
-  text-transform:capitalize;letter-spacing:.01em;
-}
-.s-REQUESTED{background:#F7E8C8;color:#7A5310}
-.s-MATCHED,.s-ACCEPTED{background:#E4E9DE;color:var(--go)}
-.s-DRIVER_ARRIVED{background:#F0E4D4;color:#8A5A20}
-.s-STARTED{background:#DCE7DF;color:#1F4A30}
-.s-COMPLETED{background:#DCE7DF;color:var(--go)}
-.s-CANCELLED{background:#F3DEDA;color:var(--danger)}
+.tag{display:inline-block;background:#eef2ff;color:var(--brand-d);border-radius:999px;padding:3px 12px;
+  font-size:12px;font-weight:700;text-transform:capitalize;letter-spacing:.01em}
+.s-REQUESTED{background:#fef3c7;color:#92400e}.s-MATCHED,.s-ACCEPTED{background:#dbeafe;color:#1e40af}
+.s-DRIVER_ARRIVED{background:#ede9fe;color:#5b21b6}.s-STARTED{background:#ccfbf1;color:#115e59}
+.s-COMPLETED{background:#dcfce7;color:#166534}.s-CANCELLED{background:#fee2e2;color:#991b1b}
 
-/* ---------- ride progress ---------- */
-.steps{display:flex;gap:4px;margin:16px 0 14px}
-.step{flex:1;font-size:11px;color:var(--muted);text-align:center;font-weight:500}
-.step span{display:block;height:4px;border-radius:2px;background:var(--line);margin-bottom:7px;transition:background .3s}
-.step.on{color:var(--ink);font-weight:600}
-.step.on span{background:var(--rick)}
+.steps{display:flex;gap:6px;margin:16px 0}.step{flex:1;font-size:11.5px;color:var(--muted);text-align:center;font-weight:500}
+.step span{display:block;height:6px;border-radius:6px;background:var(--line);margin-bottom:6px;transition:.3s}
+.step.on{color:var(--brand-d);font-weight:700}.step.on span{background:linear-gradient(90deg,var(--brand),var(--brand-2))}
 
-.row{
-  display:flex;justify-content:space-between;align-items:center;
-  padding:11px 0;border-top:1px solid var(--line);gap:10px;
-}
+.row{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-top:1px solid var(--line);font-size:14px}
 .row:first-of-type{border-top:0}
 
-.seats{display:flex;gap:7px;margin:6px 0 14px;align-items:center}
-.seat{width:24px;height:24px;border-radius:3px;background:var(--line)}
-.seat.full{background:var(--rick)}
+.seats{display:flex;gap:8px;margin:10px 0 14px;align-items:center}
+.seat{width:26px;height:26px;border-radius:8px;background:var(--line);transition:.2s}
+.seat.full{background:linear-gradient(135deg,var(--brand),var(--brand-2))}
 
-.price{
-  font-family:"Space Grotesk",sans-serif;
-  font-size:26px;font-weight:700;font-variant-numeric:tabular-nums;
-}
-
-/* ---------- empty / loading ---------- */
-.skeleton{
-  height:14px;border-radius:3px;
-  background:linear-gradient(90deg,#E7E6DA 25%,#EFEEE4 37%,#E7E6DA 63%);
-  background-size:400% 100%;animation:shimmer 1.4s ease infinite;
-  margin:6px 0;
-}
-@keyframes shimmer{0%{background-position:100% 0}100%{background-position:0 0}}
-
-@media (prefers-reduced-motion: reduce){
-  .hero,.skeleton{animation:none}
-}
+.price{font-size:26px;font-weight:800;letter-spacing:-.01em}
