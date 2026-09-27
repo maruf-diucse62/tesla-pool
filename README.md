@@ -53,6 +53,40 @@ Every seat claim runs in one DB transaction that first does `SELECT … FROM veh
 ## Known limitations / next
 No payment logic; no rate limiting; one active ride per passenger; simple corridor geography.
 
-## AI Usage (fill in honestly)
-Tools: Claude — scaffolding + explanations. Accepted: row-lock approach for seat claims. Rejected/changed: **write your own example here**.
+## AI Usage
+Tools: Claude, along with ChatGPT and Perplexity, were used at different
+stages of this project. The problem brief itself — the Dhaka Tesla Pool
+scenario, the cast (Jashim, Bullet, Nusrat, Rafiq, Shirin), and the
+requirements — is RoBenDevs' assignment PRD, not something I invented.
+What's mine is the specific engineering response to that brief: the
+database schema, the exact fare formula and numbers, the matching rule
+(same pickup zone, destinations within 2km), and the concurrency
+(row-lock) approach for seat claims — the brief explicitly leaves these
+as design decisions for the candidate to make.
+
+Used Perplexity to research how to structure a simple, testable fare
+model (base + distance charge − pool discount, and why storing money as
+integer paisa avoids float rounding issues) before settling on the exact
+numbers used here. Also used Perplexity to research best practices for
+structuring a multi-service Docker Compose setup (API + Postgres,
+healthchecks, migration/seed ordering on startup). Used Claude, ChatGPT
+and Perplexity together while working through deployment — comparing
+free-tier options for Render (API), Neon (Postgres), and Vercel
+(frontend), and troubleshooting configuration issues (environment
+variables, CORS between the Vercel frontend and Render API, the Neon
+connection string). Claude was additionally used to build out the git
+branch/commit history, verify the app end-to-end (ran the full test
+suite against a real Postgres, built the frontend), and redesign the
+UI's visual identity.
+
+Accepted: Claude's suggestion to split the git history into feature
+branches by dependency order (schema → fare → auth → pooling → routes →
+tests → docker → frontend) instead of one large commit.
+
+Rejected/changed: Claude's first pass at centering the page used
+`margin: 0 auto` on the main content and footer separately. Running it
+locally, they drifted out of alignment — the card sat right of center
+and the footer text ran off the left edge. I caught this from a
+screenshot and had it changed to a flexbox-based centering approach on
+`body` instead.
 ## Video: <link>   ·   Deployment: <link>
