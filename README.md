@@ -89,4 +89,5 @@ locally, they drifted out of alignment — the card sat right of center
 and the footer text ran off the left edge. I caught this from a
 screenshot and had it changed to a flexbox-based centering approach on
 `body` instead.
-## Video: [<link>](https://www.loom.com/share/cfe657cb2c134df6a27526d657b70833)   ·   Deployment: [<link>](https://tesla-pool.vercel.app/)
+## Demo
+[Video walkthrough](https://www.loom.com/share/cfe657cb2c134df6a27526d657b70833) · [Live deployment](https://tesla-pool.vercel.app/)
